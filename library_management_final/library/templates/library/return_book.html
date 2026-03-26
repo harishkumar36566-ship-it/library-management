@@ -1,0 +1,100 @@
+{% extends "library/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="text-primary fw-bold">📦 Return Issued Books</h3>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+            ⬅ Dashboard
+        </a>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Issued Books Table -->
+    <div class="table-responsive shadow-sm rounded">
+        <table id="returnBooksTable" class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Book</th>
+                    <th>Buyer Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Fine (₹)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issue in issued_books %}
+                <tr class="{% if issue.fine > 0 %}table-warning{% endif %}">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ issue.user.username }}</td>
+                    <td class="fw-semibold">{{ issue.book.title }}</td>
+                    <td>{{ issue.buyer_name }}</td>
+                    <td>{{ issue.buyer_phone }}</td>
+                    <td>{{ issue.buyer_email }}</td>
+                    <td>{{ issue.issue_date|date:"d M Y" }}</td>
+                    <td>{{ issue.return_date|date:"d M Y" }}</td>
+                    <td>
+                        <span class="badge {% if issue.fine > 0 %}bg-danger{% else %}bg-success{% endif %}">
+                            ₹{{ issue.fine }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="issue_id" value="{{ issue.id }}">
+                            <button type="submit" class="btn btn-success btn-sm">
+                                Return
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-muted">
+                        No books pending for return
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Include jQuery & DataTables JS/CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<!-- Initialize DataTables -->
+<script>
+    $(document).ready(function () {
+        $('#returnBooksTable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10
+        });
+    });
+</script>
+
+{% endblock %}
