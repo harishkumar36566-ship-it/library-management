@@ -1,0 +1,25 @@
+{% extends "library/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow p-4">
+        <h3 class="text-warning">📦 Update Stock</h3>
+
+        <p><strong>Book:</strong> {{ book.title }}</p>
+        <p><strong>Current Quantity:</strong> {{ book.quantity }}</p>
+        <p><strong>Available Copies:</strong> {{ book.available_copies }}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">New Quantity</label>
+                <input type="number" name="quantity" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100">
+                Update Stock
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
